@@ -15,6 +15,7 @@ from CTFd.utils.user import is_admin, authed
 from CTFd.utils.config import is_teams_mode
 from CTFd.api import CTFd_API_v1
 from CTFd.api.v1.scoreboard import ScoreboardDetail
+from CTFd.plugins.dynamic_challenges.decay import get_solve_count, logarithmic
 import CTFd.utils.scores
 from CTFd.api.v1.challenges import ChallengeList, Challenge
 from flask_restx import Namespace, Resource
@@ -375,6 +376,13 @@ class DockerChallengeType(BaseChallenge):
     blueprint = Blueprint('docker_challenges', __name__, template_folder='templates', static_folder='assets')
 
     @staticmethod
+    def calculate_value(challenge):
+        value = logarithmic(challenge)
+        challenge.value = value
+        db.session.commit()
+        return challenge
+
+    @staticmethod
     def update(challenge, request):
         """
 		This method is used to update the information associated with a challenge. This should be kept strictly to the
@@ -510,6 +518,7 @@ class DockerChallengeType(BaseChallenge):
         )
         db.session.add(solve)
         db.session.commit()
+        DockerChallengeType.calculate_value(challenge)
         # trying if this solces the detached instance error...
         #db.session.close()
 
@@ -541,6 +550,9 @@ class DockerChallenge(Challenges):
     __mapper_args__ = {'polymorphic_identity': 'docker'}
     id = db.Column(None, db.ForeignKey('challenges.id'), primary_key=True)
     docker_image = db.Column(db.String(128), index=True)
+    initial = db.Column(db.Integer, default=0)
+    minimum = db.Column(db.Integer, default=0)
+    decay = db.Column(db.Integer, default=0)
 
 
 # API

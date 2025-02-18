@@ -1,4 +1,5 @@
 {% extends "admin/challenges/update.html" %}
+
 {% block category %}
 <div class="form-group">
     <label>
@@ -14,6 +15,45 @@
     <select id="dockerimage_select" name="docker_image" class="form-control" required></select>
 </div>
 {% endblock %}
+
+{% block value %}
+<div class="form-group">
+	<label for="value">Current Value<br>
+		<small class="form-text text-muted">
+			This is how many points the challenge is worth right now.
+		</small>
+	</label>
+	<input type="number" class="form-control chal-value" name="value" value="{{ challenge.value }}" disabled>
+</div>
+
+<div class="form-group">
+	<label for="value">Initial Value<br>
+		<small class="form-text text-muted">
+			This is how many points the challenge was worth initially.
+		</small>
+	</label>
+	<input type="number" class="form-control chal-initial" name="initial" value="{{ challenge.initial }}" required>
+</div>
+
+<div class="form-group">
+	<label for="value">Decay<br>
+		<small class="form-text text-muted">
+			The amount of solves before the challenge reaches its minimum value. Earlier solves will lose less points. Later solves will lose more points.
+		</small>
+	</label>
+	<input type="number" class="form-control chal-decay" min="1" name="decay" value="{{ challenge.decay }}" required>
+</div>
+
+<div class="form-group">
+	<label for="value">Minimum Value<br>
+		<small class="form-text text-muted">
+			This is the lowest that the challenge can be worth
+		</small>
+	</label>
+	<input type="number" class="form-control chal-minimum" name="minimum" value="{{ challenge.minimum }}" required>
+</div>
+{% endblock %}
+
 {% block footer %}
 <script>
 var DOCKER_IMAGE = '{{ challenge.docker_image }}';

@@ -258,7 +258,7 @@ def get_repositories(docker, tags=False, repos=False):
     r = do_request(docker, '/images/json?all=1')
     result = list()
     for i in r.json():
-        if not i['RepoTags'] == None:
+        if i['RepoTags']:
             if not i['RepoTags'][0].split(':')[0] == '<none>':
                 if repos:
                     if not i['RepoTags'][0].split(':')[0] in repos:
@@ -276,7 +276,8 @@ def get_unavailable_ports(docker):
     for i in r.json():
         if not i['Ports'] == []:
             for p in i['Ports']:
-                result.append(p['PublicPort'])
+                if 'PublicPort' in p:
+                    result.append(p['PublicPort'])
     return result
 
 
